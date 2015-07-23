@@ -3,7 +3,7 @@
 lastword = $(word $(words $(1)),$(1))
 makedir := $(dir $(call lastword,$(MAKEFILE_LIST)))
 
-MAKEARGS := -C ~/src/buildroot O=$(CURDIR)/build BR2_CONFIG=$(CURDIR)/buildroot.config
+MAKEARGS := -C ~/src/buildroot O=$(CURDIR)/build/ BR2_CONFIG=$(CURDIR)/buildroot.config BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE=$(CURDIR)/kernel.config
 # MAKEARGS += O=$(if $(patsubst /%,,$(makedir)),$(CURDIR)/)$(patsubst %/,%,$(makedir))
 
 MAKEFLAGS += --no-print-directory
