@@ -1,0 +1,10 @@
+#!/bin/bash
+#http://stackoverflow.com/a/284671/229631
+#PATH_TO_BUILDROOT=$(realpath ../buildroot)
+PATH_TO_BUILDROOT=$(readlink -m ../buildroot)
+BR2_CONFIG=$PWD/buildroot.config
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE=$PWD/kernel.config
+OUTPUT=$PWD/build
+
+export BR2_CONFIG
+make -C $PATH_TO_BUILDROOT O=$OUTPUT BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE=$BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE BR2_CONFIG=$BR2_CONFIG
