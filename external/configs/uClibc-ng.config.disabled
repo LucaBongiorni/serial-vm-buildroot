@@ -48,7 +48,7 @@ UCLIBC_HAS_FPU=y
 # DO_C99_MATH is not set
 # DO_XSI_MATH is not set
 # UCLIBC_HAS_FENV is not set
-KERNEL_HEADERS="/home/ubuntu/serial-vm-buildroot/build/build/linux-headers-4.1.3/usr/include"
+KERNEL_HEADERS="/home/voltagex/src/serial-vm-buildroot/build/build/linux-headers-4.1.3/usr/include"
 HAVE_DOT_CONFIG=y
 
 #
@@ -231,7 +231,7 @@ UCLIBC_BUILD_NOEXECSTACK=y
 #
 # Development/debugging options
 #
-CROSS_COMPILER_PREFIX="/home/ubuntu/serial-vm-buildroot/build/host/usr/bin/i686-buildroot-linux-uclibc-"
+CROSS_COMPILER_PREFIX="/home/voltagex/src/serial-vm-buildroot/build/host/usr/bin/i686-buildroot-linux-uclibc-"
 UCLIBC_EXTRA_CFLAGS=""
 # DODEBUG is not set
 DOSTRIP=y
