@@ -8,6 +8,16 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+command -v parted >/dev/null 2>&1 || { echo "I require parted but it's not installed.  Aborting." >&2; exit 1; }
+
+parted=$(parted -v | head -n1 | cut -d " " -f 4)
+if (( $(bc <<< "$parted < 3") == 1 ))
+then
+	echo "parted's version is $parted, which may fail to create the partitions correctly (I can't find the specific bug)"
+	echo "please upgrade to at least 3.0"
+	exit 2
+fi
+
 command -v kpartx >/dev/null 2>&1 || { echo "I require kpartx but it's not installed.  Aborting." >&2; exit 1; }
 command -v extlinux >/dev/null 2>&1 || { echo "I require extlinux but it's not installed.  Aborting." >&2; exit 1; }
 
@@ -28,14 +38,11 @@ cat <<-EOF | parted -s $image
 	mkpart primary ext2 0 100%
 	set 1 boot on
 EOF
-echo parted exited with $?
 
 sync
 sleep 1
 $kpartx=$(kpartx -avs $image)
-echo kpartx exited with $?
 new_partition=$(echo $kpartx | awk '{print $3}')
-echo $?
 
 echo $new_partition
 mkfs.ext2 /dev/mapper/$new_partition
