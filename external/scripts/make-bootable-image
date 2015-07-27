@@ -22,7 +22,7 @@ mountpoint=$(mktemp -d)
 dd if=/dev/zero of=$image bs=1M count=20
 sync
 
-cat <<-EOF | parted $image
+cat <<-EOF | parted -s $image
 	mklabel msdos
 	mkpart primary ext2 0 100%
 	set 1 boot on
