@@ -28,10 +28,13 @@ cat <<-EOF | parted -s $image
 	mkpart primary ext2 0 100%
 	set 1 boot on
 EOF
+echo parted exited with $?
 
 sync
 sleep 1
-new_partition=$(kpartx -avs $image | awk '{print $3}')
+$kpartx=$(kpartx -avs $image)
+echo kpartx exited with $?
+new_partition=$(echo $kpartx | awk '{print $3}')
 echo $?
 
 echo $new_partition
