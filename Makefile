@@ -5,15 +5,15 @@ BR2_EXTERNAL = $(CURDIR)/external
 #BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE=$(CURDIR)/kernel.config #set in the defconfig
 OUTPUT = $(CURDIR)/build
 
-#test-paths:
-#	@echo $(value PATH_TO_BUILDROOT)
-
-
+	
 lastword = $(word $(words $(1)),$(1))
 makedir := $(dir $(call lastword,$(MAKEFILE_LIST)))
 
 MAKEARGS := -C $(PATH_TO_BUILDROOT) O=$(OUTPUT) BR2_EXTERNAL=$(BR2_EXTERNAL)
 MAKEFLAGS += --no-print-directory
+
+
+
 
 .PHONY: _all $(MAKECMDGOALS)
 
@@ -29,5 +29,3 @@ $(all): _all
 
 %/: _all
 	@:
-
-

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+command -v kpartx >/dev/null 2>&1 || { echo "I require kpartx but it's not installed.  Aborting." >&2; exit 1; }
+command -v extlinux >/dev/null 2>&1 || { echo "I require extlinux but it's not installed.  Aborting." >&2; exit 1; }
+
+image=$BINARIES_DIR/bootable.img
+kernel=$BINARIES_DIR/bzImage
+
+if [ ! -f $kernel ]; then
+	echo "Kernel not found at $kernel - do you need to run make first?"
+	exit 1
+fi
+
+mountpoint=$(mktemp -d)
+dd if=/dev/zero of=$image bs=1M count=20
+sync
+
+cat <<-EOF | parted $image
+	mklabel msdos
+	mkpart primary ext2 0 100%
+	set 1 boot on
+	print
+EOF
+
+sync
+sleep 1
+new_partition=$(kpartx -avs $image | awk '{print $3}')
+
+echo $new_partition
+mkfs.ext2 /dev/mapper/$new_partition
+mount /dev/mapper/$new_partition $mountpoint
+pushd $mountpoint
+cp $kernel .
+mkdir $mountpoint/boot
+extlinux --device /dev/mapper/$new_partition --install $mountpoint/boot
+
+
+cat <<-EOF > $mountpoint/boot/extlinux.conf
+ LABEL buildroot
+ KERNEL /bzImage
+ DEFAULT buildroot
+EOF
+
+popd
+sync
+umount $mountpoint
+kpartx -d $image
