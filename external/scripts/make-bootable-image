@@ -26,7 +26,6 @@ cat <<-EOF | parted $image
 	mklabel msdos
 	mkpart primary ext2 0 100%
 	set 1 boot on
-	print
 EOF
 
 sync
