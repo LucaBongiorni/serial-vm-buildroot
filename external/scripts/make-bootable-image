@@ -1,6 +1,4 @@
 #!/bin/bash
-
-set -e
 set -o nounset
 
 if [ "$EUID" -ne 0 ]
@@ -20,6 +18,7 @@ fi
 
 command -v kpartx >/dev/null 2>&1 || { echo "I require kpartx but it's not installed.  Aborting." >&2; exit 1; }
 command -v extlinux >/dev/null 2>&1 || { echo "I require extlinux but it's not installed.  Aborting." >&2; exit 1; }
+command -v qemu-img >/dev/null 2>&1 || { echo "I require qemu-img but it's not installed.  Aborting." >&2; exit 1; }
 
 image=$BINARIES_DIR/bootable.img
 kernel=$BINARIES_DIR/bzImage
@@ -46,14 +45,12 @@ sleep 2
 kpartx=$(kpartx -avs $image)
 new_partition=$(echo $kpartx | awk '{print $3}')
 
-echo $new_partition
 mkfs.ext2 /dev/mapper/$new_partition
 mount /dev/mapper/$new_partition $mountpoint
-pushd $mountpoint
+pushd $mountpoint > /dev/null
 cp $kernel .
 mkdir $mountpoint/boot
 extlinux --device /dev/mapper/$new_partition --install $mountpoint/boot
-
 
 cat <<-EOF > $mountpoint/boot/extlinux.conf
  LABEL buildroot
@@ -61,7 +58,24 @@ cat <<-EOF > $mountpoint/boot/extlinux.conf
  DEFAULT buildroot
 EOF
 
-popd
+popd > /dev/null
+
 sync
 umount $mountpoint
 kpartx -d $image
+
+echo
+echo
+echo
+
+pushd $BINARIES_DIR > /dev/null
+qemu-img convert -f raw $image -O vdi bootable.vdi
+
+echo Built the following bootable images:
+file $image
+file bootable.vdi
+
+popd > /dev/null
+
+rm -r $mountpoint
+echo done!
