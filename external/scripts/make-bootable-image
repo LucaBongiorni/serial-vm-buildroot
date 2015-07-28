@@ -33,15 +33,17 @@ mountpoint=$(mktemp -d)
 dd if=/dev/zero of=$image bs=1M count=20
 sync
 
-cat <<-EOF | parted -s $image
+cat <<-EOF | parted $image
 	mklabel msdos
 	mkpart primary ext2 0 100%
 	set 1 boot on
+	quit
 EOF
-
 sync
-sleep 1
-$kpartx=$(kpartx -avs $image)
+
+sleep 2
+
+kpartx=$(kpartx -avs $image)
 new_partition=$(echo $kpartx | awk '{print $3}')
 
 echo $new_partition
